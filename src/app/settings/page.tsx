@@ -1,18 +1,93 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { useProfile } from '@/hooks/useProfile';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import MobileNav from '@/components/layout/MobileNav';
 
 export default function SettingsPage() {
     const router = useRouter();
+    const { profile, isLoading: profileLoading, updateProfile, checkUsernameAvailable } = useProfile();
+
+    // Profile form state
+    const [username, setUsername] = useState('');
+    const [displayName, setDisplayName] = useState('');
+    const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+    const [profileMessage, setProfileMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+    const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+
+    // Delete account state
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [confirmText, setConfirmText] = useState('');
+
     const supabase = createClient();
+
+    // Initialize form with profile data
+    useEffect(() => {
+        if (profile) {
+            setUsername(profile.username || '');
+            setDisplayName(profile.display_name || '');
+        }
+    }, [profile]);
+
+    // Debounced username availability check
+    useEffect(() => {
+        if (!username || username === profile?.username) {
+            setUsernameAvailable(null);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            setIsCheckingUsername(true);
+            const available = await checkUsernameAvailable(username);
+            setUsernameAvailable(available);
+            setIsCheckingUsername(false);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [username, profile?.username, checkUsernameAvailable]);
+
+    const validateUsername = (value: string): string | null => {
+        if (value.length < 3) return 'Username must be at least 3 characters';
+        if (value.length > 20) return 'Username must be at most 20 characters';
+        if (!/^[a-zA-Z0-9_]+$/.test(value)) return 'Only letters, numbers, and underscores allowed';
+        return null;
+    };
+
+    const handleUpdateProfile = async () => {
+        setProfileMessage(null);
+
+        const usernameError = validateUsername(username);
+        if (usernameError) {
+            setProfileMessage({ type: 'error', text: usernameError });
+            return;
+        }
+
+        if (usernameAvailable === false) {
+            setProfileMessage({ type: 'error', text: 'Username is already taken' });
+            return;
+        }
+
+        setIsUpdatingProfile(true);
+
+        const result = await updateProfile({
+            username: username.toLowerCase(),
+            display_name: displayName.trim() || undefined,
+        });
+
+        if (result.success) {
+            setProfileMessage({ type: 'success', text: 'Profile updated successfully!' });
+        } else {
+            setProfileMessage({ type: 'error', text: result.error || 'Failed to update profile' });
+        }
+
+        setIsUpdatingProfile(false);
+    };
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -54,6 +129,91 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-6">
+                    {/* Profile Section */}
+                    <Card>
+                        <h2 className="text-lg font-semibold text-foreground mb-4">Profile</h2>
+
+                        {profileLoading ? (
+                            <div className="space-y-4">
+                                <div className="h-12 bg-border rounded-xl animate-pulse" />
+                                <div className="h-12 bg-border rounded-xl animate-pulse" />
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {/* Username */}
+                                <div>
+                                    <label htmlFor="username" className="block text-sm font-medium text-foreground mb-2">
+                                        Username
+                                    </label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted">@</span>
+                                        <input
+                                            id="username"
+                                            type="text"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                                            maxLength={20}
+                                            className="w-full pl-8 pr-10 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground"
+                                        />
+                                        {/* Availability indicator */}
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            {isCheckingUsername ? (
+                                                <div className="w-5 h-5 border-2 border-muted border-t-primary rounded-full animate-spin" />
+                                            ) : usernameAvailable === true ? (
+                                                <svg className="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            ) : usernameAvailable === false ? (
+                                                <svg className="w-5 h-5 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-muted mt-1">
+                                        3-20 characters, letters, numbers, and underscores only
+                                    </p>
+                                </div>
+
+                                {/* Display Name */}
+                                <div>
+                                    <label htmlFor="displayName" className="block text-sm font-medium text-foreground mb-2">
+                                        Display Name <span className="text-muted font-normal">(optional)</span>
+                                    </label>
+                                    <input
+                                        id="displayName"
+                                        type="text"
+                                        value={displayName}
+                                        onChange={(e) => setDisplayName(e.target.value)}
+                                        maxLength={50}
+                                        placeholder="Your display name"
+                                        className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted"
+                                    />
+                                </div>
+
+                                {/* Messages */}
+                                {profileMessage && (
+                                    <div className={`p-3 rounded-xl text-sm animate-fade-in ${profileMessage.type === 'success'
+                                            ? 'bg-success/10 border border-success/20 text-success'
+                                            : 'bg-error/10 border border-error/20 text-error'
+                                        }`}>
+                                        {profileMessage.text}
+                                    </div>
+                                )}
+
+                                {/* Save Button */}
+                                <Button
+                                    onClick={handleUpdateProfile}
+                                    isLoading={isUpdatingProfile}
+                                    disabled={usernameAvailable === false || isCheckingUsername}
+                                    className="w-full sm:w-auto"
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
+                        )}
+                    </Card>
+
                     {/* Account Section */}
                     <Card>
                         <h2 className="text-lg font-semibold text-foreground mb-4">Account</h2>

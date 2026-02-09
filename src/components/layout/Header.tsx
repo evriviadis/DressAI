@@ -5,11 +5,13 @@ import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
+import { useProfile } from '@/hooks/useProfile';
 import Button from '@/components/ui/Button';
 
 export default function Header() {
     const pathname = usePathname();
     const [user, setUser] = useState<User | null>(null);
+    const { profile, isLoading: profileLoading } = useProfile();
     const supabase = createClient();
 
     useEffect(() => {
@@ -29,6 +31,11 @@ export default function Header() {
     const handleSignOut = async () => {
         await supabase.auth.signOut();
     };
+
+    // Display username or fallback to email
+    const displayName = profile?.username
+        ? `@${profile.username}`
+        : profile?.display_name || user?.email;
 
     return (
         <header className="sticky top-0 z-40 glass border-b border-border">
@@ -77,7 +84,11 @@ export default function Header() {
                         {user ? (
                             <>
                                 <span className="hidden sm:block text-sm text-muted">
-                                    {user.email}
+                                    {profileLoading ? (
+                                        <span className="inline-block w-20 h-4 bg-border rounded animate-pulse" />
+                                    ) : (
+                                        <span className="text-primary font-medium">{displayName}</span>
+                                    )}
                                 </span>
                                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                                     Sign Out
