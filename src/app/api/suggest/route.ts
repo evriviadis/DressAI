@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@/lib/supabase/server';
 import { ClothingItem } from '@/lib/supabase/types';
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || '');
+import { generateFromText } from '@/lib/llm';
 
 const SUGGEST_SYSTEM_PROMPT = `You are a professional fashion stylist. Given a JSON list of clothing items from a user's wardrobe, select exactly ONE complete outfit for the specified situation.
 
@@ -69,8 +67,7 @@ export async function POST(request: NextRequest) {
             category: item.category, // Override with database category
         }));
 
-        // Call Gemini API with text-only prompt
-        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
+        // Call AI provider (Gemini or Kimi — controlled by LLM_PROVIDER in src/lib/llm.ts)
         const prompt = `${SUGGEST_SYSTEM_PROMPT}
 
 Situation: ${situation}
@@ -78,8 +75,7 @@ Situation: ${situation}
 Available Wardrobe Items:
 ${JSON.stringify(itemsForAI, null, 2)}`;
 
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
+        const responseText = await generateFromText(prompt);
 
         // Parse the JSON response
         let suggestion;

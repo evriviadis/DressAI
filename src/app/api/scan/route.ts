@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@/lib/supabase/server';
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || '');
+import { generateFromImages } from '@/lib/llm';
 
 const SCAN_SYSTEM_PROMPT = `You are a fashion expert AI that analyzes clothing images. Analyze the provided images and return ONLY a valid JSON object (no markdown, no code blocks) describing the garment with the following structure:
 
@@ -59,28 +57,19 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Convert images to base64 for Gemini
+        // Convert images to base64
         const imageParts = await Promise.all(
             images.map(async (image) => {
                 const bytes = await image.arrayBuffer();
                 const base64 = Buffer.from(bytes).toString('base64');
-                return {
-                    inlineData: {
-                        data: base64,
-                        mimeType: image.type,
-                    },
-                };
+                return { base64, mimeType: image.type };
             })
         );
 
-        // Call Gemini API with fallback
-        let result;
+        // Call AI provider (Gemini or Kimi — controlled by LLM_PROVIDER in src/lib/llm.ts)
+        let responseText: string;
         try {
-            const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
-            result = await model.generateContent([
-                SCAN_SYSTEM_PROMPT,
-                ...imageParts,
-            ]);
+            responseText = await generateFromImages(SCAN_SYSTEM_PROMPT, imageParts);
         } catch (aiError: unknown) {
             const error = aiError as { status?: number; message?: string };
             if (error.status === 429) {
@@ -91,8 +80,6 @@ export async function POST(request: NextRequest) {
             }
             throw aiError;
         }
-
-        const responseText = result.response.text();
 
         // Parse the JSON response
         let aiDescription;

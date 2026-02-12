@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@/lib/supabase/server';
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || '');
+import { generateFromImages } from '@/lib/llm';
 
 const BATCH_SCAN_SYSTEM_PROMPT = `You are a fashion expert AI that analyzes multiple clothing images in batch. 
 Each image provided is a SEPARATE, UNIQUE clothing item.
@@ -97,28 +95,19 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Step 2: Convert images to base64 for Gemini
+        // Step 2: Convert images to base64
         const imageParts = await Promise.all(
             images.map(async (image) => {
                 const bytes = await image.arrayBuffer();
                 const base64 = Buffer.from(bytes).toString('base64');
-                return {
-                    inlineData: {
-                        data: base64,
-                        mimeType: image.type,
-                    },
-                };
+                return { base64, mimeType: image.type };
             })
         );
 
-        // Step 3: Call Gemini API with all images
-        let result;
+        // Step 3: Call AI provider (Gemini or Kimi — controlled by LLM_PROVIDER in src/lib/llm.ts)
+        let responseText: string;
         try {
-            const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
-            result = await model.generateContent([
-                BATCH_SCAN_SYSTEM_PROMPT,
-                ...imageParts,
-            ]);
+            responseText = await generateFromImages(BATCH_SCAN_SYSTEM_PROMPT, imageParts);
         } catch (aiError: unknown) {
             const error = aiError as { status?: number; message?: string };
             console.log(error);
@@ -130,8 +119,6 @@ export async function POST(request: NextRequest) {
             }
             throw aiError;
         }
-
-        const responseText = result.response.text();
 
         // Step 4: Parse the JSON array response
         let aiDescriptions: Array<{
