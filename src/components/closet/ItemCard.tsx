@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import Card from '@/components/ui/Card';
 import { ClothingItem } from '@/lib/supabase/types';
-import { useState } from 'react';
 
 interface ItemCardProps {
     item: ClothingItem;
@@ -13,48 +12,28 @@ interface ItemCardProps {
     selected?: boolean;
 }
 
-export default function ItemCard({ item, onClick, onDelete, onEdit, selected = false }: ItemCardProps) {
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
+export default function ItemCard({ item, onClick, onEdit, selected = false }: ItemCardProps) {
     const imageUrl = item.image_urls?.front || Object.values(item.image_urls || {})[0];
     const description = item.ai_description;
 
-    const handleDelete = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setShowConfirm(true);
-    };
-
-    const confirmDelete = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setIsDeleting(true);
-        try {
-            const response = await fetch(`/api/items/${item.id}`, {
-                method: 'DELETE',
-            });
-            if (response.ok && onDelete) {
-                onDelete(item.id);
-            } else {
-                alert('Failed to delete item');
-            }
-        } catch {
-            alert('Failed to delete item');
-        } finally {
-            setIsDeleting(false);
-            setShowConfirm(false);
+    const handleCardClick = () => {
+        // If onClick is provided (e.g. outfit selection mode), use it
+        if (onClick) {
+            onClick();
+            return;
         }
-    };
-
-    const cancelDelete = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setShowConfirm(false);
+        // Otherwise, open the edit modal
+        if (onEdit) {
+            onEdit(item);
+        }
     };
 
     return (
         <Card
-            hover={!!onClick}
+            hover
             padding="none"
-            className={`overflow-hidden group ${selected ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-            onClick={onClick}
+            className={`overflow-hidden group cursor-pointer ${selected ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+            onClick={handleCardClick}
         >
             {/* Image */}
             <div className="relative aspect-square bg-border-light overflow-hidden">
@@ -79,54 +58,6 @@ export default function ItemCard({ item, onClick, onDelete, onEdit, selected = f
                         {item.category}
                     </span>
                 </div>
-
-                {/* Edit Button */}
-                {onEdit && !showConfirm && (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onEdit(item); }}
-                        className="absolute top-2 right-12 w-8 h-8 bg-black/50 hover:bg-primary text-white rounded-lg backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                        title="Edit item"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                    </button>
-                )}
-
-                {/* Delete Button */}
-                {onDelete && !showConfirm && (
-                    <button
-                        onClick={handleDelete}
-                        className="absolute top-2 right-2 w-8 h-8 bg-black/50 hover:bg-error text-white rounded-lg backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                        title="Delete item"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                )}
-
-                {/* Confirm Delete Overlay */}
-                {showConfirm && (
-                    <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 animate-fade-in">
-                        <p className="text-white text-sm text-center mb-3">Delete this item?</p>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={cancelDelete}
-                                className="px-3 py-1.5 text-sm bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={confirmDelete}
-                                disabled={isDeleting}
-                                className="px-3 py-1.5 text-sm bg-error hover:bg-error/80 text-white rounded-lg transition-colors disabled:opacity-50"
-                            >
-                                {isDeleting ? 'Deleting...' : 'Delete'}
-                            </button>
-                        </div>
-                    </div>
-                )}
 
                 {/* Selected Checkmark */}
                 {selected && (

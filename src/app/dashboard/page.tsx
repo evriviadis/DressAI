@@ -10,6 +10,7 @@ import ScanModal from '@/components/scan/ScanModal';
 import BatchScanModal from '@/components/scan/BatchScanModal';
 import SituationSelector from '@/components/outfit/SituationSelector';
 import OutfitDisplay from '@/components/outfit/OutfitDisplay';
+import FunnyLoader from '@/components/ui/FunnyLoader';
 import Button from '@/components/ui/Button';
 import MobileNav from '@/components/layout/MobileNav';
 
@@ -289,6 +290,8 @@ export default function DashboardPage() {
                                     Add Your First Item
                                 </Button>
                             </div>
+                        ) : isSuggesting ? (
+                            <FunnyLoader />
                         ) : (
                             <SituationSelector onSelect={handleSituationSelect} isLoading={isSuggesting} />
                         )}
@@ -321,6 +324,10 @@ export default function DashboardPage() {
                     item={editingItem}
                     onSave={(updatedItem) => {
                         setItems(items.map(i => i.id === updatedItem.id ? updatedItem as ClothingItem : i));
+                        setEditingItem(null);
+                    }}
+                    onDelete={(itemId) => {
+                        setItems(items.filter(i => i.id !== itemId));
                         setEditingItem(null);
                     }}
                 />
