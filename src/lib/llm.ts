@@ -15,7 +15,7 @@ const GEMINI_MODEL = 'gemini-3-flash-preview';
 // --- Kimi config (via NVIDIA API) ---
 const NVIDIA_API_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 const KIMI_MODEL = 'moonshotai/kimi-k2.5';
-const KIMI_TIMEOUT_MS = 600_000; // 10 minutes — Kimi is a reasoning model, responses take 60s+
+const KIMI_TIMEOUT_MS = 300_000; // 10 minutes — Kimi is a reasoning model, responses take 60s+
 
 // Keep-alive agent so the TCP socket stays open during long waits
 const httpsAgent = new https.Agent({ keepAlive: true });

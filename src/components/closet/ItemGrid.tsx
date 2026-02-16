@@ -7,11 +7,12 @@ interface ItemGridProps {
     items: ClothingItem[];
     onItemClick?: (item: ClothingItem) => void;
     onItemDelete?: (itemId: string) => void;
+    onItemEdit?: (item: ClothingItem) => void;
     selectedIds?: string[];
     emptyMessage?: string;
 }
 
-export default function ItemGrid({ items, onItemClick, onItemDelete, selectedIds = [], emptyMessage }: ItemGridProps) {
+export default function ItemGrid({ items, onItemClick, onItemDelete, onItemEdit, selectedIds = [], emptyMessage }: ItemGridProps) {
     if (items.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -38,6 +39,7 @@ export default function ItemGrid({ items, onItemClick, onItemDelete, selectedIds
                     item={item}
                     onClick={onItemClick ? () => onItemClick(item) : undefined}
                     onDelete={onItemDelete}
+                    onEdit={onItemEdit}
                     selected={selectedIds.includes(item.id)}
                 />
             ))}

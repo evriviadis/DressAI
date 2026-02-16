@@ -2,19 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { ClothingItem } from '@/lib/supabase/types';
 import { generateFromText } from '@/lib/llm';
+import { getWeatherForUser } from '@/lib/weather';
 
 const SUGGEST_SYSTEM_PROMPT = `You are a professional fashion stylist. Given a JSON list of clothing items from a user's wardrobe, select exactly ONE complete outfit for the specified situation.
 
 Rules:
 1. Select items that work well together in terms of color, style, and occasion
 2. A complete outfit should typically include: top + bottom (or dress), and optionally outerwear and accessories
-3. Consider the weather/season appropriateness for the situation
+3. If current weather data is provided, STRONGLY factor in temperature, conditions, and wind when choosing items. For example, pick lighter fabrics and no outerwear for hot weather, or suggest layering and heavier materials for cold/windy weather.
 4. Prioritize items whose "occasions" or "style_vibes" match the situation
 
 Return ONLY a valid JSON object (no markdown, no code blocks) with this structure:
 {
   "item_ids": ["array of selected item UUIDs"],
-  "styling_reason": "brief explanation of why these items work together for this situation",
+  "styling_reason": "brief explanation of why these items work together for this situation, mentioning weather considerations if weather data was provided",
   "styling_tips": "optional tips for how to wear/accessorize the outfit"
 }`;
 
@@ -60,6 +61,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Fetch current weather (best-effort, does not block on failure)
+        const weather = await getWeatherForUser();
+
         // Prepare minimal item data for AI (to save tokens)
         const itemsForAI = items.map((item: ClothingItem) => ({
             id: item.id,
@@ -67,10 +71,15 @@ export async function POST(request: NextRequest) {
             category: item.category, // Override with database category
         }));
 
+        // Build the weather context block (if available)
+        const weatherBlock = weather
+            ? `\nCurrent Weather (${weather.city}, ${weather.country}):\n- Temperature: ${weather.temp_celsius}°C (feels like ${weather.feels_like}°C)\n- Conditions: ${weather.description}\n- Humidity: ${weather.humidity}%\n- Wind: ${weather.wind_speed} m/s\n`
+            : '';
+
         // Call AI provider (Gemini or Kimi — controlled by LLM_PROVIDER in src/lib/llm.ts)
         const prompt = `${SUGGEST_SYSTEM_PROMPT}
 
-Situation: ${situation}
+Situation: ${situation}${weatherBlock}
 
 Available Wardrobe Items:
 ${JSON.stringify(itemsForAI, null, 2)}`;

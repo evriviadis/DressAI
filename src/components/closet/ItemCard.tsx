@@ -9,10 +9,11 @@ interface ItemCardProps {
     item: ClothingItem;
     onClick?: () => void;
     onDelete?: (id: string) => void;
+    onEdit?: (item: ClothingItem) => void;
     selected?: boolean;
 }
 
-export default function ItemCard({ item, onClick, onDelete, selected = false }: ItemCardProps) {
+export default function ItemCard({ item, onClick, onDelete, onEdit, selected = false }: ItemCardProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const imageUrl = item.image_urls?.front || Object.values(item.image_urls || {})[0];
@@ -78,6 +79,19 @@ export default function ItemCard({ item, onClick, onDelete, selected = false }: 
                         {item.category}
                     </span>
                 </div>
+
+                {/* Edit Button */}
+                {onEdit && !showConfirm && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onEdit(item); }}
+                        className="absolute top-2 right-12 w-8 h-8 bg-black/50 hover:bg-primary text-white rounded-lg backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                        title="Edit item"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </button>
+                )}
 
                 {/* Delete Button */}
                 {onDelete && !showConfirm && (

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { ClothingItem } from '@/lib/supabase/types';
 import ItemGrid from '@/components/closet/ItemGrid';
+import EditItemModal from '@/components/closet/EditItemModal';
 import ScanModal from '@/components/scan/ScanModal';
 import BatchScanModal from '@/components/scan/BatchScanModal';
 import SituationSelector from '@/components/outfit/SituationSelector';
@@ -49,6 +50,7 @@ export default function DashboardPage() {
     const [outfitSuggestion, setOutfitSuggestion] = useState<OutfitSuggestion | null>(null);
     const [activeTab, setActiveTab] = useState<'closet' | 'suggest'>('closet');
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const [editingItem, setEditingItem] = useState<ClothingItem | null>(null);
 
     const supabase = createClient();
 
@@ -232,15 +234,15 @@ export default function DashboardPage() {
                                 key={cat.value}
                                 onClick={() => setSelectedCategory(cat.value)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${selectedCategory === cat.value
-                                        ? 'bg-primary text-white'
-                                        : 'bg-card text-muted hover:text-foreground border border-border'
+                                    ? 'bg-primary text-white'
+                                    : 'bg-card text-muted hover:text-foreground border border-border'
                                     }`}
                             >
                                 <span>{cat.icon}</span>
                                 <span className="text-sm font-medium">{cat.label}</span>
                                 <span className={`text-xs px-1.5 py-0.5 rounded-full ${selectedCategory === cat.value
-                                        ? 'bg-white/20'
-                                        : 'bg-border'
+                                    ? 'bg-white/20'
+                                    : 'bg-border'
                                     }`}>
                                     {categoryCounts[cat.value]}
                                 </span>
@@ -261,6 +263,7 @@ export default function DashboardPage() {
                         items={filteredItems}
                         emptyMessage={EMPTY_MESSAGES[selectedCategory]}
                         onItemDelete={(itemId) => setItems(items.filter(i => i.id !== itemId))}
+                        onItemEdit={(item) => setEditingItem(item)}
                     />
                 ) : outfitSuggestion ? (
                     <OutfitDisplay
@@ -309,6 +312,19 @@ export default function DashboardPage() {
 
             {/* Mobile Nav */}
             <MobileNav />
+
+            {/* Edit Item Modal */}
+            {editingItem && (
+                <EditItemModal
+                    isOpen={true}
+                    onClose={() => setEditingItem(null)}
+                    item={editingItem}
+                    onSave={(updatedItem) => {
+                        setItems(items.map(i => i.id === updatedItem.id ? updatedItem as ClothingItem : i));
+                        setEditingItem(null);
+                    }}
+                />
+            )}
         </div>
     );
 }
