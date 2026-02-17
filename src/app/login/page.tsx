@@ -143,8 +143,6 @@ function LoginForm() {
     if (showForgotPassword) {
         return (
             <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary-light/10 -z-10" />
-
                 <Card className="w-full max-w-md" padding="lg">
                     <div className="text-center mb-8">
                         <div className="w-16 h-16 mx-auto gradient-hero rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mb-4">
@@ -167,7 +165,7 @@ function LoginForm() {
                                 value={identifier}
                                 onChange={(e) => setIdentifier(e.target.value)}
                                 required
-                                className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted"
+                                className="w-full px-4 py-3 rounded-xl input-dark"
                                 placeholder="you@example.com or username"
                             />
                         </div>
@@ -210,13 +208,10 @@ function LoginForm() {
     // Main Login/Signup View
     return (
         <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
-            {/* Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary-light/10 -z-10" />
-
             <Card className="w-full max-w-md" padding="lg">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 mx-auto gradient-hero rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mb-4">
+                    <div className="w-16 h-16 mx-auto gradient-hero rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mb-4 animate-glow-pulse">
                         <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
@@ -246,7 +241,7 @@ function LoginForm() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted"
+                                    className="w-full px-4 py-3 rounded-xl input-dark"
                                     placeholder="you@example.com"
                                 />
                             </div>
@@ -265,7 +260,7 @@ function LoginForm() {
                                         onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                                         required
                                         maxLength={20}
-                                        className="w-full pl-8 pr-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted"
+                                        className="w-full pl-8 pr-4 py-3 rounded-xl input-dark"
                                         placeholder="yourname"
                                     />
                                 </div>
@@ -284,7 +279,7 @@ function LoginForm() {
                                 value={identifier}
                                 onChange={(e) => setIdentifier(e.target.value)}
                                 required
-                                className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted"
+                                className="w-full px-4 py-3 rounded-xl input-dark"
                                 placeholder="you@example.com or username"
                             />
                         </div>
@@ -301,7 +296,7 @@ function LoginForm() {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                             minLength={6}
-                            className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted"
+                            className="w-full px-4 py-3 rounded-xl input-dark"
                             placeholder="••••••••"
                         />
                     </div>
@@ -318,7 +313,7 @@ function LoginForm() {
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 minLength={6}
-                                className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted"
+                                className="w-full px-4 py-3 rounded-xl input-dark"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -375,7 +370,7 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-muted">Loading...</div>}>
             <LoginForm />
         </Suspense>
     );

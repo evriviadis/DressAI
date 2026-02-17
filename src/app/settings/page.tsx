@@ -135,8 +135,8 @@ export default function SettingsPage() {
 
                         {profileLoading ? (
                             <div className="space-y-4">
-                                <div className="h-12 bg-border rounded-xl animate-pulse" />
-                                <div className="h-12 bg-border rounded-xl animate-pulse" />
+                                <div className="h-12 rounded-xl skeleton" />
+                                <div className="h-12 rounded-xl skeleton" />
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -153,7 +153,7 @@ export default function SettingsPage() {
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                                             maxLength={20}
-                                            className="w-full pl-8 pr-10 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground"
+                                            className="w-full pl-8 pr-10 py-3 rounded-xl input-dark"
                                         />
                                         {/* Availability indicator */}
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -187,15 +187,15 @@ export default function SettingsPage() {
                                         onChange={(e) => setDisplayName(e.target.value)}
                                         maxLength={50}
                                         placeholder="Your display name"
-                                        className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted"
+                                        className="w-full px-4 py-3 rounded-xl input-dark"
                                     />
                                 </div>
 
                                 {/* Messages */}
                                 {profileMessage && (
                                     <div className={`p-3 rounded-xl text-sm animate-fade-in ${profileMessage.type === 'success'
-                                            ? 'bg-success/10 border border-success/20 text-success'
-                                            : 'bg-error/10 border border-error/20 text-error'
+                                        ? 'bg-success/10 border border-success/20 text-success'
+                                        : 'bg-error/10 border border-error/20 text-error'
                                         }`}>
                                         {profileMessage.text}
                                     </div>
@@ -228,7 +228,7 @@ export default function SettingsPage() {
                     </Card>
 
                     {/* Danger Zone */}
-                    <Card className="border-error/30">
+                    <Card className="border-error/20">
                         <h2 className="text-lg font-semibold text-error mb-2">Danger Zone</h2>
                         <p className="text-muted text-sm mb-4">
                             Once you delete your account, there is no going back. All your items, outfits, and images will be permanently deleted.
@@ -238,7 +238,7 @@ export default function SettingsPage() {
                             <Button
                                 variant="outline"
                                 onClick={() => setShowDeleteConfirm(true)}
-                                className="border-error text-error hover:bg-error/10"
+                                className="border-error/40 text-error hover:bg-error/10 hover:border-error"
                             >
                                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -255,7 +255,7 @@ export default function SettingsPage() {
                                     value={confirmText}
                                     onChange={(e) => setConfirmText(e.target.value)}
                                     placeholder="Type DELETE to confirm"
-                                    className="w-full px-4 py-3 rounded-xl border border-error/30 bg-background focus:border-error focus:ring-2 focus:ring-error/20 outline-none transition-all text-foreground"
+                                    className="w-full px-4 py-3 rounded-xl input-dark !border-error/30 focus:!border-error focus:!shadow-[0_0_0_3px_rgba(255,82,82,0.15)]"
                                 />
                                 <div className="flex gap-3">
                                     <Button
@@ -272,7 +272,7 @@ export default function SettingsPage() {
                                         onClick={handleDeleteAccount}
                                         isLoading={isDeleting}
                                         disabled={confirmText !== 'DELETE'}
-                                        className="flex-1 bg-error hover:bg-error/90"
+                                        className="flex-1 !bg-error hover:!bg-error/90 !from-error !via-error !to-error"
                                     >
                                         Delete My Account
                                     </Button>

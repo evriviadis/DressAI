@@ -199,9 +199,9 @@ export default function DashboardPage() {
                 <div className="flex gap-2 mb-6">
                     <button
                         onClick={() => setActiveTab('closet')}
-                        className={`px-6 py-3 rounded-xl font-medium transition-all ${activeTab === 'closet'
-                            ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                            : 'bg-card text-muted hover:text-foreground border border-border'
+                        className={`px-6 py-3 rounded-xl font-medium transition-all cursor-pointer ${activeTab === 'closet'
+                            ? 'bg-gradient-to-r from-primary via-[#7c4dff] to-secondary text-white shadow-[0_0_20px_rgba(224,64,251,0.3)]'
+                            : 'glass-card text-muted hover:text-foreground'
                             }`}
                     >
                         <span className="flex items-center gap-2">
@@ -213,9 +213,9 @@ export default function DashboardPage() {
                     </button>
                     <button
                         onClick={() => setActiveTab('suggest')}
-                        className={`px-6 py-3 rounded-xl font-medium transition-all ${activeTab === 'suggest'
-                            ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                            : 'bg-card text-muted hover:text-foreground border border-border'
+                        className={`px-6 py-3 rounded-xl font-medium transition-all cursor-pointer ${activeTab === 'suggest'
+                            ? 'bg-gradient-to-r from-primary via-[#7c4dff] to-secondary text-white shadow-[0_0_20px_rgba(224,64,251,0.3)]'
+                            : 'glass-card text-muted hover:text-foreground'
                             }`}
                     >
                         <span className="flex items-center gap-2">
@@ -234,16 +234,16 @@ export default function DashboardPage() {
                             <button
                                 key={cat.value}
                                 onClick={() => setSelectedCategory(cat.value)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${selectedCategory === cat.value
-                                    ? 'bg-primary text-white'
-                                    : 'bg-card text-muted hover:text-foreground border border-border'
+                                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all cursor-pointer ${selectedCategory === cat.value
+                                    ? 'bg-primary/20 text-primary border border-primary/30 shadow-[0_0_10px_rgba(224,64,251,0.15)]'
+                                    : 'glass-card text-muted hover:text-foreground'
                                     }`}
                             >
                                 <span>{cat.icon}</span>
                                 <span className="text-sm font-medium">{cat.label}</span>
                                 <span className={`text-xs px-1.5 py-0.5 rounded-full ${selectedCategory === cat.value
-                                    ? 'bg-white/20'
-                                    : 'bg-border'
+                                    ? 'bg-primary/20'
+                                    : 'bg-white/5'
                                     }`}>
                                     {categoryCounts[cat.value]}
                                 </span>
@@ -279,7 +279,7 @@ export default function DashboardPage() {
                     <div className="max-w-2xl mx-auto">
                         {items.length === 0 ? (
                             <div className="text-center py-16">
-                                <div className="w-20 h-20 mx-auto bg-border-light rounded-full flex items-center justify-center mb-4">
+                                <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(130, 140, 200, 0.08)' }}>
                                     <svg className="w-10 h-10 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                     </svg>

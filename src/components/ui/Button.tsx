@@ -10,13 +10,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className = '', variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
-        const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+        const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
         const variants = {
-            primary: 'bg-primary text-white hover:bg-primary-hover focus:ring-primary shadow-lg shadow-primary/25',
-            secondary: 'bg-secondary text-white hover:bg-secondary-hover focus:ring-secondary',
-            outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary',
-            ghost: 'text-muted hover:text-foreground hover:bg-card focus:ring-muted',
+            primary: 'bg-gradient-to-r from-primary via-[#7c4dff] to-secondary text-white hover:shadow-[0_0_25px_rgba(224,64,251,0.4)] focus:ring-primary',
+            secondary: 'bg-gradient-to-r from-secondary to-[#18ffff] text-[#06071b] font-semibold hover:shadow-[0_0_25px_rgba(0,229,255,0.4)] focus:ring-secondary',
+            outline: 'border border-primary/40 text-primary hover:bg-primary/10 hover:border-primary hover:shadow-[0_0_15px_rgba(224,64,251,0.15)] focus:ring-primary',
+            ghost: 'text-muted hover:text-foreground hover:bg-white/5 focus:ring-muted',
         };
 
         const sizes = {

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
@@ -10,6 +10,7 @@ import Button from '@/components/ui/Button';
 
 export default function Header() {
     const pathname = usePathname();
+    const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const { profile, isLoading: profileLoading } = useProfile();
     const supabase = createClient();
@@ -30,6 +31,7 @@ export default function Header() {
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
+        router.push('/');
     };
 
     // Display username or fallback to email
@@ -38,7 +40,7 @@ export default function Header() {
         : profile?.display_name || user?.email;
 
     return (
-        <header className="sticky top-0 z-40 glass border-b border-border">
+        <header className="sticky top-0 z-40 glass border-b border-primary/10" style={{ boxShadow: '0 1px 20px rgba(224, 64, 251, 0.06)' }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
@@ -48,30 +50,30 @@ export default function Header() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
                         </div>
-                        <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
+                        <span className="text-xl font-bold gradient-text">
                             DressAI
                         </span>
                     </Link>
 
                     {/* Navigation */}
-                    <nav className="hidden md:flex items-center gap-6">
+                    <nav className="flex items-center gap-3 sm:gap-6">
                         {user ? (
                             <>
                                 <Link
                                     href="/dashboard"
-                                    className={`font-medium transition-colors ${pathname === '/dashboard' ? 'text-primary' : 'text-muted hover:text-foreground'}`}
+                                    className={`text-sm sm:text-base font-medium transition-colors ${pathname === '/dashboard' ? 'text-primary' : 'text-muted hover:text-foreground'}`}
                                 >
-                                    My Closet
+                                    Closet
                                 </Link>
                                 <Link
                                     href="/outfits"
-                                    className={`font-medium transition-colors ${pathname === '/outfits' ? 'text-primary' : 'text-muted hover:text-foreground'}`}
+                                    className={`text-sm sm:text-base font-medium transition-colors ${pathname === '/outfits' ? 'text-primary' : 'text-muted hover:text-foreground'}`}
                                 >
                                     Outfits
                                 </Link>
                                 <Link
                                     href="/settings"
-                                    className={`font-medium transition-colors ${pathname === '/settings' ? 'text-primary' : 'text-muted hover:text-foreground'}`}
+                                    className={`hidden md:inline font-medium transition-colors ${pathname === '/settings' ? 'text-primary' : 'text-muted hover:text-foreground'}`}
                                 >
                                     Settings
                                 </Link>
@@ -85,7 +87,7 @@ export default function Header() {
                             <>
                                 <span className="hidden sm:block text-sm text-muted">
                                     {profileLoading ? (
-                                        <span className="inline-block w-20 h-4 bg-border rounded animate-pulse" />
+                                        <span className="inline-block w-20 h-4 rounded animate-pulse" style={{ background: 'rgba(130, 140, 200, 0.15)' }} />
                                     ) : (
                                         <span className="text-primary font-medium">{displayName}</span>
                                     )}

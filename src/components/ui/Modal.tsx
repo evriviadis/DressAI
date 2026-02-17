@@ -43,11 +43,11 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
             onClick={onClose}
         >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" />
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" />
 
             {/* Modal */}
             <div
-                className={`relative bg-card rounded-2xl shadow-2xl w-full ${sizes[size]} max-h-[90vh] overflow-hidden animate-slide-up`}
+                className={`relative glass-card rounded-2xl shadow-2xl w-full ${sizes[size]} max-h-[90vh] overflow-hidden animate-slide-up`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}

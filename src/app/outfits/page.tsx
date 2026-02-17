@@ -122,7 +122,7 @@ export default function OutfitsPage() {
                     </div>
                 ) : outfits.length === 0 ? (
                     <div className="text-center py-16">
-                        <div className="w-20 h-20 mx-auto bg-border-light rounded-full flex items-center justify-center mb-4">
+                        <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(130, 140, 200, 0.08)' }}>
                             <svg className="w-10 h-10 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
@@ -143,7 +143,7 @@ export default function OutfitsPage() {
                                     {/* Outfit Header */}
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-3">
-                                            <span className="inline-block px-3 py-1.5 bg-primary/10 text-primary text-sm font-semibold rounded-full capitalize">
+                                            <span className="inline-block px-3 py-1.5 bg-primary/15 text-primary text-sm font-semibold rounded-full capitalize neon-border">
                                                 {outfit.situation}
                                             </span>
                                             <span className="text-muted-light text-xs">
@@ -160,14 +160,14 @@ export default function OutfitsPage() {
                                                 <button
                                                     onClick={() => setConfirmingDeleteId(null)}
                                                     disabled={isDeletingOutfit}
-                                                    className="px-3 py-1.5 text-xs font-medium bg-border-light hover:bg-border text-muted rounded-lg transition-colors"
+                                                    className="px-3 py-1.5 text-xs font-medium bg-white/5 hover:bg-white/10 text-muted rounded-lg transition-colors cursor-pointer"
                                                 >
                                                     Cancel
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteOutfit(outfit.id)}
                                                     disabled={isDeletingOutfit}
-                                                    className="px-3 py-1.5 text-xs font-medium bg-error hover:bg-error/80 text-white rounded-lg transition-colors disabled:opacity-50"
+                                                    className="px-3 py-1.5 text-xs font-medium bg-error hover:bg-error/80 text-white rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
                                                 >
                                                     {isDeletingOutfit ? 'Deleting...' : 'Delete'}
                                                 </button>
@@ -175,7 +175,7 @@ export default function OutfitsPage() {
                                         ) : (
                                             <button
                                                 onClick={() => setConfirmingDeleteId(outfit.id)}
-                                                className="p-2 text-muted hover:text-error hover:bg-error/10 rounded-xl transition-all"
+                                                className="p-2 text-muted hover:text-error hover:bg-error/10 rounded-xl transition-all cursor-pointer"
                                                 title="Delete outfit"
                                             >
                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,7 +192,8 @@ export default function OutfitsPage() {
                                             return (
                                                 <div
                                                     key={item.id}
-                                                    className="relative flex-shrink-0 w-36 sm:w-auto aspect-square rounded-xl overflow-hidden bg-border-light group"
+                                                    className="relative flex-shrink-0 w-36 sm:w-auto aspect-square rounded-xl overflow-hidden group"
+                                                    style={{ background: 'rgba(130, 140, 200, 0.08)' }}
                                                 >
                                                     {imgUrl ? (
                                                         <Image
@@ -209,7 +210,7 @@ export default function OutfitsPage() {
                                                         </div>
                                                     )}
                                                     {/* Category label overlay */}
-                                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
                                                         <p className="text-white text-xs font-medium truncate">
                                                             {item.name || item.ai_description?.type || item.category}
                                                         </p>
@@ -226,7 +227,7 @@ export default function OutfitsPage() {
                                     {outfit.styling_reason && (
                                         <div className="mt-4 pt-4 border-t border-border">
                                             <div className="flex gap-2 items-start">
-                                                <div className="flex-shrink-0 w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center mt-0.5">
+                                                <div className="flex-shrink-0 w-6 h-6 bg-primary/15 rounded-full flex items-center justify-center mt-0.5">
                                                     <svg className="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                                     </svg>
