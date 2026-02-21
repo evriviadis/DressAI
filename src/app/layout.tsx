@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Outfit, Playfair_Display } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
-import BubbleCursor from "@/components/effects/BubbleCursor";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -16,8 +15,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
-  title: "DressAI - Your AI Personal Stylist",
+  title: "evryWear - Your AI Personal Stylist",
   description: "Digitize your wardrobe and get AI-powered outfit suggestions for any occasion",
   keywords: ["wardrobe", "AI", "fashion", "outfit", "stylist", "clothing"],
 };
@@ -29,16 +34,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${outfit.variable} ${geistMono.variable} antialiased min-h-screen`}>
+      <body className={`${outfit.variable} ${geistMono.variable} ${playfair.variable} antialiased min-h-screen`}>
         {/* Animated gradient mesh background */}
         <div className="mesh-gradient">
           <div className="mesh-blob mesh-blob-1" />
           <div className="mesh-blob mesh-blob-2" />
           <div className="mesh-blob mesh-blob-3" />
         </div>
-
-        {/* Cursor bubbles effect */}
-        <BubbleCursor />
 
         <Header />
         <main className="pb-20 md:pb-0">

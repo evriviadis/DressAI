@@ -126,7 +126,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-8 border-t border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-muted text-sm">
-          <p>© 2025 DressAI. Powered by Google Gemini AI.</p>
+          <p>© 2025 evryWear. Powered by Google Gemini AI.</p>
         </div>
       </footer>
     </div>

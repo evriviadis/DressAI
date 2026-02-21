@@ -90,3 +90,24 @@ CREATE POLICY "Users can delete own outfits"
 -- CREATE POLICY "Users can delete own images"
 --   ON storage.objects FOR DELETE
 --   USING (bucket_id = 'garments' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+-- Outfit Ratings table: stores explicit user ratings for feedback loop
+CREATE TABLE IF NOT EXISTS outfit_ratings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  outfit_items JSONB NOT NULL DEFAULT '[]',
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS outfit_ratings_user_id_idx ON outfit_ratings(user_id);
+
+ALTER TABLE outfit_ratings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own ratings"
+  ON outfit_ratings FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own ratings"
+  ON outfit_ratings FOR INSERT
+  WITH CHECK (auth.uid() = user_id);

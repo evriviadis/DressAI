@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import StarRating from '@/components/outfit/StarRating';
 import { ClothingItem } from '@/lib/supabase/types';
 
 interface OutfitDisplayProps {
@@ -12,6 +13,7 @@ interface OutfitDisplayProps {
     stylingTips?: string;
     onReset: () => void;
     onSave: () => void;
+    onRate?: (rating: number) => void;
 }
 
 export default function OutfitDisplay({
@@ -20,7 +22,8 @@ export default function OutfitDisplay({
     stylingReason,
     stylingTips,
     onReset,
-    onSave
+    onSave,
+    onRate
 }: OutfitDisplayProps) {
     return (
         <div className="space-y-6 animate-slide-up">
@@ -98,6 +101,13 @@ export default function OutfitDisplay({
                 </Card>
             )}
 
+            {/* Star Rating (optional, independent of save) */}
+            {onRate && (
+                <Card className="border-accent/10">
+                    <StarRating onRate={onRate} />
+                </Card>
+            )}
+
             {/* Action Buttons */}
             <div className="flex gap-3">
                 <Button variant="outline" className="flex-1" onClick={onReset}>
@@ -110,3 +120,4 @@ export default function OutfitDisplay({
         </div>
     );
 }
+

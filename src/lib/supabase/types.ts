@@ -46,6 +46,24 @@ export interface Outfit {
     created_at: string;
 }
 
+export interface OutfitRatingItem {
+    category: string;
+    colors: {
+        primary: string;
+        secondary?: string;
+        accent?: string;
+    };
+    style_vibes: string[];
+}
+
+export interface OutfitRating {
+    id: string;
+    user_id: string;
+    outfit_items: OutfitRatingItem[];
+    rating: number;
+    created_at: string;
+}
+
 export interface Profile {
     id: string;
     username: string;
@@ -67,6 +85,11 @@ export interface Database {
                 Row: Outfit;
                 Insert: Omit<Outfit, 'id' | 'created_at'>;
                 Update: Partial<Omit<Outfit, 'id'>>;
+            };
+            outfit_ratings: {
+                Row: OutfitRating;
+                Insert: Omit<OutfitRating, 'id' | 'created_at'>;
+                Update: Partial<Omit<OutfitRating, 'id'>>;
             };
         };
     };

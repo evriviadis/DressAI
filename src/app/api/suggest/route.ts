@@ -13,6 +13,7 @@ Rules:
    - Outdoors: appropriate warmth/coverage for the outside temperature, wind, and conditions
    - Indoors: the outfit should still be comfortable and stylish when outer layers are removed. Suggest layering (e.g., a jacket over a nice top) so the user looks great both outside and inside.
 4. Prioritize items whose "occasions" or "style_vibes" match the situation
+5. If user style preferences are provided (from past outfit ratings), strongly favor items and color palettes similar to their favorites (rated 4-5 stars), and actively avoid styles, colors, and combinations similar to their dislikes (rated 1-2 stars).
 
 Return ONLY a valid JSON object (no markdown, no code blocks) with this structure:
 {
@@ -67,6 +68,42 @@ export async function POST(request: NextRequest) {
         // Fetch current weather (best-effort, does not block on failure)
         const weather = await getWeatherForUser();
 
+        // Fetch user's past outfit ratings for personalisation
+        let preferencesBlock = '';
+        try {
+            const { data: ratings } = await supabase
+                .from('outfit_ratings')
+                .select('outfit_items, rating')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (ratings && ratings.length > 0) {
+                const favorites = ratings
+                    .filter((r: { rating: number }) => r.rating >= 4)
+                    .slice(0, 3)
+                    .map((r: { outfit_items: unknown }) => r.outfit_items);
+
+                const dislikes = ratings
+                    .filter((r: { rating: number }) => r.rating <= 2)
+                    .slice(0, 3)
+                    .map((r: { outfit_items: unknown }) => r.outfit_items);
+
+                if (favorites.length > 0 || dislikes.length > 0) {
+                    preferencesBlock = '\nUser Style Preferences (from past ratings):';
+                    if (favorites.length > 0) {
+                        preferencesBlock += `\nFavorites (rated 4-5 ⭐): ${JSON.stringify(favorites)}`;
+                    }
+                    if (dislikes.length > 0) {
+                        preferencesBlock += `\nDislikes (rated 1-2 ⭐): ${JSON.stringify(dislikes)}`;
+                    }
+                    preferencesBlock += '\nUse these to tailor your outfit selection toward styles the user loves, and avoid styles they disliked.\n';
+                }
+            }
+        } catch (prefError) {
+            // Non-critical: continue without preferences
+            console.warn('Failed to fetch user preferences:', prefError);
+        }
+
         // Prepare minimal item data for AI (to save tokens)
         const itemsForAI = items.map((item: ClothingItem) => ({
             id: item.id,
@@ -82,7 +119,7 @@ export async function POST(request: NextRequest) {
         // Call AI provider (Gemini or Kimi — controlled by LLM_PROVIDER in src/lib/llm.ts)
         const prompt = `${SUGGEST_SYSTEM_PROMPT}
 
-Situation: ${situation}${weatherBlock}
+Situation: ${situation}${weatherBlock}${preferencesBlock}
 
 Available Wardrobe Items:
 ${JSON.stringify(itemsForAI, null, 2)}`;

@@ -167,6 +167,30 @@ export default function DashboardPage() {
         }
     };
 
+    const handleRateOutfit = async (rating: number) => {
+        if (!outfitSuggestion) return;
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            // Build lightweight snapshot: only category, colors, style_vibes
+            const outfitItems = outfitSuggestion.items.map(item => ({
+                category: item.category,
+                colors: item.ai_description?.colors || { primary: 'unknown' },
+                style_vibes: item.ai_description?.style_vibes || [],
+            }));
+
+            await supabase.from('outfit_ratings').insert({
+                user_id: user.id,
+                outfit_items: outfitItems,
+                rating,
+            });
+        } catch (err) {
+            console.error('Error saving rating:', err);
+        }
+    };
+
     return (
         <div className="min-h-[calc(100vh-4rem)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -274,6 +298,7 @@ export default function DashboardPage() {
                         stylingTips={outfitSuggestion.styling_tips}
                         onReset={() => setOutfitSuggestion(null)}
                         onSave={handleSaveOutfit}
+                        onRate={handleRateOutfit}
                     />
                 ) : (
                     <div className="max-w-2xl mx-auto">
