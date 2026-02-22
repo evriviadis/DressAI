@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { ClothingItem } from '@/lib/supabase/types';
-import { generateFromText } from '@/lib/llm';
+import { GEMINI_MODEL, GEMINI_MODEL_2, generateFromText } from '@/lib/llm';
 import { getWeatherForUser } from '@/lib/weather';
 
 const SUGGEST_SYSTEM_PROMPT = `You are a professional fashion stylist. Given a JSON list of clothing items from a user's wardrobe, select exactly ONE complete outfit for the specified situation.
@@ -124,7 +124,7 @@ Situation: ${situation}${weatherBlock}${preferencesBlock}
 Available Wardrobe Items:
 ${JSON.stringify(itemsForAI, null, 2)}`;
 
-        const responseText = await generateFromText(prompt);
+        const responseText = await generateFromText(prompt, GEMINI_MODEL_2);
 
         // Parse the JSON response
         let suggestion;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { generateFromImages } from '@/lib/llm';
+import { generateFromImages, GEMINI_MODEL_2 } from '@/lib/llm';
 
 const SCAN_SYSTEM_PROMPT = `You are a fashion expert AI that analyzes clothing images. Analyze the provided images and return ONLY a valid JSON object (no markdown, no code blocks) describing the garment with the following structure:
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         // Call AI provider (Gemini or Kimi — controlled by LLM_PROVIDER in src/lib/llm.ts)
         let responseText: string;
         try {
-            responseText = await generateFromImages(SCAN_SYSTEM_PROMPT, imageParts);
+            responseText = await generateFromImages(SCAN_SYSTEM_PROMPT, imageParts, GEMINI_MODEL_2);
         } catch (aiError: unknown) {
             const error = aiError as { status?: number; message?: string };
             if (error.status === 429) {

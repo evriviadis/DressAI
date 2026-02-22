@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { generateFromImages } from '@/lib/llm';
+import { generateFromImages, GEMINI_MODEL_2 } from '@/lib/llm';
 
 const BATCH_SCAN_SYSTEM_PROMPT = `You are a fashion expert AI that analyzes multiple clothing images in batch. 
 Each image provided is a SEPARATE, UNIQUE clothing item.
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
         // Step 3: Call AI provider (Gemini or Kimi — controlled by LLM_PROVIDER in src/lib/llm.ts)
         let responseText: string;
         try {
-            responseText = await generateFromImages(BATCH_SCAN_SYSTEM_PROMPT, imageParts);
+            responseText = await generateFromImages(BATCH_SCAN_SYSTEM_PROMPT, imageParts, GEMINI_MODEL_2);
         } catch (aiError: unknown) {
             const error = aiError as { status?: number; message?: string };
             console.log(error);
