@@ -104,7 +104,11 @@ export async function POST(request: NextRequest) {
         for (let i = 0; i < images.length; i++) {
             const image = images[i];
             const label = imageLabels[i];
-            const fileName = `${user.id}/${Date.now()}_${label}_${image.name}`;
+            // Sanitize filename — iOS Safari can send names with spaces/special chars
+            const safeName = image.name
+                .replace(/[^a-zA-Z0-9._-]/g, '_')
+                .replace(/_+/g, '_');
+            const fileName = `${user.id}/${Date.now()}_${label}_${safeName}`;
 
             const { error: uploadError } = await supabase.storage
                 .from('garments')

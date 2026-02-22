@@ -67,7 +67,12 @@ export async function POST(request: NextRequest) {
 
         for (let i = 0; i < images.length; i++) {
             const image = images[i];
-            const fileName = `${user.id}/${Date.now()}_batch_${i}_${image.name}`;
+            // Sanitize filename — iOS Safari can send names with spaces/special chars
+            // that Supabase Storage rejects ("The string did not match the expected pattern")
+            const safeName = image.name
+                .replace(/[^a-zA-Z0-9._-]/g, '_')  // replace unsafe chars with underscore
+                .replace(/_+/g, '_');                 // collapse multiple underscores
+            const fileName = `${user.id}/${Date.now()}_batch_${i}_${safeName}`;
 
             const { error: uploadError } = await supabase.storage
                 .from('garments')
