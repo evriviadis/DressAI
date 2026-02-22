@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
+import { compressImages } from '@/lib/imageCompression';
 
 interface BatchScanModalProps {
     isOpen: boolean;
@@ -83,11 +84,14 @@ export default function BatchScanModal({ isOpen, onClose, onSuccess }: BatchScan
 
         setIsScanning(true);
         setError(null);
-        setProgress('Uploading images...');
+        setProgress('Compressing images...');
 
         try {
+            // Compress images client-side to stay within Vercel's 4.5 MB body limit
+            const compressed = await compressImages(images);
+
             const formData = new FormData();
-            images.forEach(img => formData.append('images', img));
+            compressed.forEach(img => formData.append('images', img));
 
             setProgress(`Analyzing ${images.length} item${images.length > 1 ? 's' : ''} with AI...`);
 
@@ -95,6 +99,13 @@ export default function BatchScanModal({ isOpen, onClose, onSuccess }: BatchScan
                 method: 'POST',
                 body: formData,
             });
+
+            // Handle non-JSON error responses (e.g. Vercel's plain-text 413)
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                const text = await response.text();
+                throw new Error(text || `Server error (${response.status})`);
+            }
 
             const data = await response.json();
 
