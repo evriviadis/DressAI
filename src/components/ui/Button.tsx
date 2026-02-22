@@ -10,44 +10,41 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className = '', variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
-        const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
+        const base = 'inline-flex items-center justify-center font-medium tracking-wide transition-all duration-200 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer';
 
         const variants = {
-            primary: 'bg-gradient-to-r from-primary via-[#7c4dff] to-secondary text-white hover:shadow-[0_0_25px_rgba(224,64,251,0.4)] focus:ring-primary',
-            secondary: 'bg-gradient-to-r from-secondary to-[#18ffff] text-[#06071b] font-semibold hover:shadow-[0_0_25px_rgba(0,229,255,0.4)] focus:ring-secondary',
-            outline: 'border border-primary/40 text-primary hover:bg-primary/10 hover:border-primary hover:shadow-[0_0_15px_rgba(224,64,251,0.15)] focus:ring-primary',
-            ghost: 'text-muted hover:text-foreground hover:bg-white/5 focus:ring-muted',
+            primary: 'bg-white text-black hover:bg-neutral-100 active:bg-neutral-200',
+            secondary: 'bg-neutral-900 text-white border border-white/10 hover:border-white/25 hover:bg-neutral-800',
+            outline: 'border border-white/25 text-white hover:border-white/60 hover:bg-white/5 active:bg-white/10',
+            ghost: 'text-neutral-500 hover:text-white hover:bg-white/5',
         };
 
         const sizes = {
-            sm: 'px-3 py-1.5 text-sm',
-            md: 'px-5 py-2.5 text-base',
-            lg: 'px-7 py-3.5 text-lg',
+            sm: 'px-4 py-2 text-xs tracking-[0.05em]',
+            md: 'px-6 py-2.5 text-sm',
+            lg: 'px-8 py-3 text-sm tracking-[0.06em]',
         };
 
         return (
             <button
                 ref={ref}
-                className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+                className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
                 disabled={disabled || isLoading}
                 {...props}
             >
                 {isLoading ? (
                     <>
-                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <svg className="animate-spin -ml-1 mr-2 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
                         Loading...
                     </>
-                ) : (
-                    children
-                )}
+                ) : children}
             </button>
         );
     }
 );
 
 Button.displayName = 'Button';
-
 export default Button;

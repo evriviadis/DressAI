@@ -38,45 +38,40 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
     };
 
     const modalContent = (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            onClick={onClose}
-        >
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" />
+            <div className="absolute inset-0 bg-black/80 animate-fade-in" />
 
             {/* Modal */}
             <div
-                className={`relative glass-card rounded-2xl shadow-2xl w-full ${sizes[size]} max-h-[90vh] overflow-hidden animate-slide-up`}
+                className={`relative bg-[#0f0f0f] border border-white/10 w-full ${sizes[size]} max-h-[90vh] overflow-hidden animate-slide-up rounded-t-xl sm:rounded-sm`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 {title && (
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-                        <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-white/8">
+                        <h2 className="text-base font-semibold text-white tracking-tight">{title}</h2>
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-full hover:bg-border transition-colors text-muted hover:text-foreground"
+                            className="text-neutral-500 hover:text-white transition-colors"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
                 )}
 
                 {/* Content */}
-                <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+                <div className="overflow-y-auto max-h-[calc(90vh-60px)]">
                     {children}
                 </div>
             </div>
         </div>
     );
 
-    // Use portal to render modal at document root
     if (typeof window !== 'undefined') {
         return createPortal(modalContent, document.body);
     }
-
     return null;
 }

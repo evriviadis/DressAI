@@ -6,13 +6,12 @@ import { createClient } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { useProfile } from '@/hooks/useProfile';
-import Button from '@/components/ui/Button';
 
 export default function Header() {
     const pathname = usePathname();
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
-    const { profile, isLoading: profileLoading } = useProfile();
+    const { profile } = useProfile();
     const supabase = createClient();
 
     useEffect(() => {
@@ -34,79 +33,55 @@ export default function Header() {
         router.push('/');
     };
 
-    // Display username or fallback to email
     const displayName = profile?.username
         ? `@${profile.username}`
         : profile?.display_name || user?.email;
 
     return (
-        <header className="sticky top-0 z-40 glass border-b border-primary/10" style={{ boxShadow: '0 1px 20px rgba(224, 64, 251, 0.06)' }}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    {/* Logo */}
-                    <Link href="/" className="flex items-center group">
-                        <span className="text-2xl font-semibold gradient-text tracking-tight" style={{ fontFamily: 'var(--font-playfair), serif' }}>
-                            evry<span className="font-bold">W</span>ear
-                        </span>
-                    </Link>
+        <header className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm border-b border-white/6">
+            <div className="max-w-6xl mx-auto px-6 sm:px-10 h-14 flex items-center justify-between">
+                {/* Logo */}
+                <Link href="/" className="flex items-center gap-1 group">
+                    <span className="text-white font-semibold tracking-[-0.02em] text-base">
+                        evry<span className="font-light text-neutral-400 group-hover:text-neutral-300 transition-colors duration-200">Wear</span>
+                    </span>
+                </Link>
 
-                    {/* Navigation */}
-                    <nav className="flex items-center gap-3 sm:gap-6">
-                        {user ? (
-                            <>
+                {/* Nav */}
+                <nav className="flex items-center gap-7">
+                    {user ? (
+                        <>
+                            {[{ href: '/dashboard', label: 'Closet' }, { href: '/outfits', label: 'Outfits' }, { href: '/settings', label: 'Settings' }].map(({ href, label }) => (
                                 <Link
-                                    href="/dashboard"
-                                    className={`text-sm sm:text-base font-medium transition-colors ${pathname === '/dashboard' ? 'text-primary' : 'text-muted hover:text-foreground'}`}
+                                    key={href}
+                                    href={href}
+                                    className={`hidden md:inline text-xs tracking-[0.08em] uppercase transition-colors duration-200 ${pathname === href ? 'text-white' : 'text-neutral-600 hover:text-neutral-300'}`}
                                 >
-                                    Closet
+                                    {label}
                                 </Link>
-                                <Link
-                                    href="/outfits"
-                                    className={`text-sm sm:text-base font-medium transition-colors ${pathname === '/outfits' ? 'text-primary' : 'text-muted hover:text-foreground'}`}
-                                >
-                                    Outfits
-                                </Link>
-                                <Link
-                                    href="/settings"
-                                    className={`hidden md:inline font-medium transition-colors ${pathname === '/settings' ? 'text-primary' : 'text-muted hover:text-foreground'}`}
-                                >
-                                    Settings
-                                </Link>
-                            </>
-                        ) : null}
-                    </nav>
-
-                    {/* Auth Buttons */}
-                    <div className="flex items-center gap-3">
-                        {user ? (
-                            <>
-                                <span className="hidden sm:block text-sm text-muted">
-                                    {profileLoading ? (
-                                        <span className="inline-block w-20 h-4 rounded animate-pulse" style={{ background: 'rgba(130, 140, 200, 0.15)' }} />
-                                    ) : (
-                                        <span className="text-primary font-medium">{displayName}</span>
-                                    )}
-                                </span>
-                                <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                                    Sign Out
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <Link href="/login">
-                                    <Button variant="ghost" size="sm">
-                                        Sign In
-                                    </Button>
-                                </Link>
-                                <Link href="/login?signup=true">
-                                    <Button size="sm">
-                                        Get Started
-                                    </Button>
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                </div>
+                            ))}
+                            <span className="hidden sm:block text-xs text-neutral-700">{displayName}</span>
+                            <button
+                                onClick={handleSignOut}
+                                className="text-xs tracking-[0.08em] uppercase text-neutral-600 hover:text-white transition-colors duration-200 cursor-pointer"
+                            >
+                                Sign out
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link href="/login" className="text-xs tracking-[0.08em] uppercase text-neutral-600 hover:text-white transition-colors duration-200">
+                                Sign in
+                            </Link>
+                            <Link
+                                href="/login?signup=true"
+                                className="text-xs tracking-[0.08em] uppercase border border-white/20 text-white px-5 py-2 hover:border-white/50 hover:bg-white/5 transition-all duration-200"
+                            >
+                                Get started
+                            </Link>
+                        </>
+                    )}
+                </nav>
             </div>
         </header>
     );
