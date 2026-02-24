@@ -57,6 +57,21 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Validate file types via magic bytes (client MIME type is not trusted)
+        for (let i = 0; i < images.length; i++) {
+            const bytes = await images[i].arrayBuffer();
+            const header = new Uint8Array(bytes).slice(0, 12);
+            const isJpeg = header[0] === 0xFF && header[1] === 0xD8;
+            const isPng = header[0] === 0x89 && header[1] === 0x50 && header[2] === 0x4E && header[3] === 0x47;
+            const isWebp = header[8] === 0x57 && header[9] === 0x45 && header[10] === 0x42 && header[11] === 0x50;
+            if (!isJpeg && !isPng && !isWebp) {
+                return NextResponse.json(
+                    { error: `Image ${i + 1} is not a valid JPEG, PNG, or WebP file.` },
+                    { status: 400 }
+                );
+            }
+        }
+
         // Convert images to base64
         const imageParts = await Promise.all(
             images.map(async (image) => {
@@ -91,8 +106,9 @@ export async function POST(request: NextRequest) {
                 .trim();
             aiDescription = JSON.parse(cleanedResponse);
         } catch {
+            console.error('[scan] Unparseable AI response:', responseText);
             return NextResponse.json(
-                { error: 'Failed to parse AI response', raw: responseText },
+                { error: 'Failed to process image. Please try again.' },
                 { status: 500 }
             );
         }

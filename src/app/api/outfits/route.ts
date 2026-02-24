@@ -25,41 +25,59 @@ export async function POST(request: NextRequest) {
 
         let coverImageUrl: string | null = null;
 
-        // If we have a source image URL, fetch it, compress it, and upload
-        if (source_image_url) {
+        // If we have a source image URL, validate it first to prevent SSRF.
+        // Only fetch URLs that belong to our own Supabase storage bucket.
+        if (source_image_url && typeof source_image_url === 'string') {
+            const supabaseStorageHost = process.env.NEXT_PUBLIC_SUPABASE_URL
+                ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+                : null;
+
+            let isSafeUrl = false;
             try {
-                // Fetch the source image
-                const imageResponse = await fetch(source_image_url);
-                if (imageResponse.ok) {
-                    const imageBuffer = await imageResponse.arrayBuffer();
-                    const uint8Array = new Uint8Array(imageBuffer);
-
-                    // Determine content type
-                    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
-                    const extension = contentType.includes('png') ? 'png' : 'jpg';
-
-                    // Upload to Supabase storage as outfit cover
-                    const fileName = `${user.id}/outfit_covers/${Date.now()}.${extension}`;
-
-                    const { error: uploadError } = await supabase.storage
-                        .from('garments')
-                        .upload(fileName, uint8Array, {
-                            contentType: contentType,
-                            upsert: false,
-                        });
-
-                    if (!uploadError) {
-                        const { data: urlData } = supabase.storage
-                            .from('garments')
-                            .getPublicUrl(fileName);
-                        coverImageUrl = urlData.publicUrl;
-                    } else {
-                        console.error('Failed to upload cover image:', uploadError);
-                    }
+                const parsedUrl = new URL(source_image_url);
+                // Allow only https and only from our own Supabase project host
+                if (
+                    parsedUrl.protocol === 'https:' &&
+                    supabaseStorageHost &&
+                    parsedUrl.hostname === supabaseStorageHost &&
+                    parsedUrl.pathname.includes('/storage/v1/object/public/garments/')
+                ) {
+                    isSafeUrl = true;
                 }
-            } catch (imgError) {
-                console.error('Failed to process cover image:', imgError);
-                // Continue without cover image
+            } catch {
+                // Malformed URL — skip silently
+            }
+
+            if (isSafeUrl) {
+                try {
+                    const imageResponse = await fetch(source_image_url);
+                    if (imageResponse.ok) {
+                        const imageBuffer = await imageResponse.arrayBuffer();
+                        const uint8Array = new Uint8Array(imageBuffer);
+
+                        const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
+                        const extension = contentType.includes('png') ? 'png' : 'jpg';
+                        const fileName = `${user.id}/outfit_covers/${Date.now()}.${extension}`;
+
+                        const { error: uploadError } = await supabase.storage
+                            .from('garments')
+                            .upload(fileName, uint8Array, {
+                                contentType: contentType,
+                                upsert: false,
+                            });
+
+                        if (!uploadError) {
+                            const { data: urlData } = supabase.storage
+                                .from('garments')
+                                .getPublicUrl(fileName);
+                            coverImageUrl = urlData.publicUrl;
+                        } else {
+                            console.error('Failed to upload cover image:', uploadError);
+                        }
+                    }
+                } catch (imgError) {
+                    console.error('Failed to process cover image:', imgError);
+                }
             }
         }
 

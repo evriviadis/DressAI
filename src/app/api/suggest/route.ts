@@ -45,6 +45,21 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Server-side length limit (defence-in-depth with client maxLength)
+        if (situation.length > 200) {
+            return NextResponse.json(
+                { error: 'Situation must be 200 characters or fewer.' },
+                { status: 400 }
+            );
+        }
+
+        // Basic prompt-injection sanitization — strip common override phrases
+        const safeSituation = situation
+            .replace(/ignore\s+(all\s+)?(previous|above|prior)\s+(instructions?|rules?|prompts?)/gi, '')
+            .replace(/\bsystem\s+prompt\b/gi, '')
+            .replace(/\byou\s+are\s+(now|a|an)\b/gi, '')
+            .trim();
+
         // Fetch all user's items with their AI descriptions
         const { data: items, error: fetchError } = await supabase
             .from('items')
@@ -119,7 +134,7 @@ export async function POST(request: NextRequest) {
         // Call AI provider (Gemini or Kimi — controlled by LLM_PROVIDER in src/lib/llm.ts)
         const prompt = `${SUGGEST_SYSTEM_PROMPT}
 
-Situation: ${situation}${weatherBlock}${preferencesBlock}
+Situation: ${safeSituation}${weatherBlock}${preferencesBlock}
 
 Available Wardrobe Items:
 ${JSON.stringify(itemsForAI, null, 2)}`;

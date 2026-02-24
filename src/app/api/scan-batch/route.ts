@@ -100,6 +100,21 @@ export async function POST(request: NextRequest) {
             });
         }
 
+        // Validate file types via magic bytes (client MIME type is not trusted)
+        for (let i = 0; i < images.length; i++) {
+            const bytes = await images[i].arrayBuffer();
+            const header = new Uint8Array(bytes).slice(0, 12);
+            const isJpeg = header[0] === 0xFF && header[1] === 0xD8;
+            const isPng = header[0] === 0x89 && header[1] === 0x50 && header[2] === 0x4E && header[3] === 0x47;
+            const isWebp = header[8] === 0x57 && header[9] === 0x45 && header[10] === 0x42 && header[11] === 0x50;
+            if (!isJpeg && !isPng && !isWebp) {
+                return NextResponse.json(
+                    { error: `Image ${i + 1} is not a valid JPEG, PNG, or WebP file.` },
+                    { status: 400 }
+                );
+            }
+        }
+
         // Step 2: Convert images to base64
         const imageParts = await Promise.all(
             images.map(async (image) => {
@@ -153,9 +168,9 @@ export async function POST(request: NextRequest) {
                 throw new Error('Response is not an array');
             }
         } catch {
-            console.error('Failed to parse AI response:', responseText);
+            console.error('[scan-batch] Unparseable AI response:', responseText);
             return NextResponse.json(
-                { error: 'Failed to parse AI response', raw: responseText },
+                { error: 'Failed to process images. Please try again.' },
                 { status: 500 }
             );
         }

@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# evryWear 🧥✨
 
-## Getting Started
+**Dress smarter. Your entire wardrobe, digitized.**
 
-First, run the development server:
+## About the Project
+evryWear is a personal project built mostly for fun. The main goal is to solve the everyday dilemma of "What do I wear today?" 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+It is designed to help people make effortless decisions about their daily outfits and upgrade their personal style without having to stress, overthink, or put in a ton of effort. Just scan your clothes, and let the AI do the heavy lifting of figuring out what looks good together based on the weather and the occasion.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Core Features
+* **Smart Scanning:** Digitize your wardrobe simply by uploading photos. The AI automatically identifies colors, materials, and styles.
+* **Digital Closet:** Browse and filter your clothes across categories (Tops, Bottoms, Shoes, etc.).
+* **AI Stylist:** Get curated outfit suggestions pulled straight from your actual wardrobe, tailored to the current weather and your personal preferences.
+* **Feedback Loop:** Rate the AI's suggestions so it learns your unique style over time.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
+* **Frontend:** Next.js 14 (App Router), Tailwind CSS
+* **Backend/Auth/Database:** Supabase
+* **AI Engine:** Google Gemini Vision & Text APIs
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Running Locally
 
-## Learn More
+**Prerequisites:** Node.js 18+, a [Supabase](https://supabase.com) project, and API keys for Google Gemini and OpenWeatherMap.
 
-To learn more about Next.js, take a look at the following resources:
+1. **Clone the repo & install dependencies**
+   ```bash
+   git clone https://github.com/your-username/DressAI.git
+   cd DressAI
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Set up environment variables**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   Create a `.env.local` file in the project root:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   GOOGLE_AI_KEY=your_google_gemini_api_key
+   OPENWEATHERMAP_API_KEY=your_openweathermap_api_key
+   ```
 
-## Deploy on Vercel
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   Open [http://localhost:3000](http://localhost:3000) in your browser.

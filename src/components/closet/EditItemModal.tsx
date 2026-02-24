@@ -282,8 +282,8 @@ export default function EditItemModal({ isOpen, onClose, item, onSave, onDelete 
                                         type="button"
                                         onClick={() => toggleSeason(season)}
                                         className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all capitalize ${aiDesc.season.includes(season)
-                                            ? 'bg-primary text-white shadow-md shadow-primary/20'
-                                            : 'bg-border-light text-muted hover:text-foreground border border-border'
+                                            ? 'bg-foreground text-background shadow-md'
+                                            : 'bg-border-light text-muted hover:text-foreground hover:border-foreground/30 border border-border'
                                             }`}
                                     >
                                         {season}

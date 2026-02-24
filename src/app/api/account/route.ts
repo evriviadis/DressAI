@@ -55,17 +55,14 @@ export async function DELETE() {
             .delete()
             .eq('user_id', user.id);
 
-        // Note: To fully delete the user from auth.users, you need to use Supabase Admin API
-        // This requires the service_role key which should only be used server-side
-        // For now, we'll sign out the user - the auth record will remain but data is deleted
-        // For full deletion, implement this in a Supabase Edge Function with admin privileges
-
-        // Sign out the user
+        // Note: full auth.users deletion requires a Supabase Edge Function with
+        // the service_role key. For now we sign the user out — all their data and
+        // images are already wiped above. The auth record is a ghost with no data.
         await supabase.auth.signOut();
 
         return NextResponse.json({
             success: true,
-            message: 'Account data deleted successfully. You have been signed out.'
+            message: 'Account data deleted successfully. You have been signed out.',
         });
     } catch (error) {
         console.error('Delete account error:', error);
