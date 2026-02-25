@@ -27,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${geistMono.variable} antialiased min-h-screen`}>
+    <html lang="en" className="scroll-smooth">
+      <body suppressHydrationWarning className={`${inter.variable} ${geistMono.variable} antialiased min-h-screen`}>
         <Header />
         <main className="pb-20 md:pb-0">
           {children}

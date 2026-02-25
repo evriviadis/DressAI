@@ -139,7 +139,7 @@ Situation: ${safeSituation}${weatherBlock}${preferencesBlock}
 Available Wardrobe Items:
 ${JSON.stringify(itemsForAI, null, 2)}`;
 
-        const responseText = await generateFromText(prompt, GEMINI_MODEL_2);
+        const responseText = await generateFromText(prompt, GEMINI_MODEL_2)
 
         // Parse the JSON response
         let suggestion;

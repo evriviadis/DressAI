@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
+import { motion } from 'framer-motion';
 
 interface SituationSelectorProps {
     onSelect: (situation: string) => void;
@@ -49,33 +50,55 @@ export default function SituationSelector({ onSelect, isLoading = false }: Situa
             </div>
 
             {/* Preset Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/6">
+            <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                        opacity: 1,
+                        transition: { staggerChildren: 0.05 }
+                    }
+                }}
+                className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+            >
                 {PRESET_SITUATIONS.map((situation) => {
                     const isSelected = selectedPreset === situation.value && !showCustom;
                     return (
-                        <button
+                        <motion.button
                             key={situation.value}
+                            variants={{
+                                hidden: { opacity: 0, y: 20 },
+                                visible: { opacity: 1, y: 0 }
+                            }}
+                            whileHover={{ scale: 1.03, y: -4 }}
+                            whileTap={{ scale: 0.97 }}
                             onClick={() => handlePresetSelect(situation.value)}
-                            className={`group p-5 text-left transition-all duration-200 cursor-pointer ${isSelected ? 'bg-white' : 'bg-black hover:bg-neutral-950'
+                            className={`group relative p-5 text-left rounded-2xl border transition-colors cursor-pointer overflow-hidden ${isSelected
+                                ? 'bg-white border-white'
+                                : 'bg-neutral-900 border-white/5 hover:border-white/20'
                                 }`}
                         >
+                            {/* Subtle hover glow */}
+                            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
                             <svg
-                                className={`w-5 h-5 mb-3 transition-colors ${isSelected ? 'text-black' : 'text-neutral-600 group-hover:text-neutral-400'}`}
+                                className={`w-6 h-6 mb-4 transition-colors ${isSelected ? 'text-black' : 'text-neutral-500 group-hover:text-white'}`}
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                 strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                             >
                                 <path d={situation.icon} />
                             </svg>
-                            <p className={`text-sm font-medium transition-colors ${isSelected ? 'text-black' : 'text-white'}`}>
+                            <p className={`text-sm font-semibold tracking-wide transition-colors ${isSelected ? 'text-black' : 'text-white'}`}>
                                 {situation.label}
                             </p>
-                            <p className={`text-xs mt-0.5 transition-colors ${isSelected ? 'text-neutral-600' : 'text-neutral-700 group-hover:text-neutral-500'}`}>
+                            <p className={`text-[10px] mt-1 uppercase tracking-wider transition-colors ${isSelected ? 'text-neutral-600' : 'text-neutral-500 group-hover:text-neutral-400'}`}>
                                 {situation.description}
                             </p>
-                        </button>
+                        </motion.button>
                     );
                 })}
-            </div>
+            </motion.div>
 
             {/* Divider + Custom toggle */}
             <div className="flex items-center gap-4">

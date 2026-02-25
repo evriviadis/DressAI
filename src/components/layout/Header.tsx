@@ -70,12 +70,12 @@ export default function Header() {
                         </>
                     ) : (
                         <>
-                            <Link href="/login" className="text-xs tracking-[0.08em] uppercase text-neutral-600 hover:text-white transition-colors duration-200">
+                            <Link href="/login" className="hidden min-[380px]:block text-xs tracking-[0.08em] uppercase text-neutral-600 hover:text-white transition-colors duration-200">
                                 Sign in
                             </Link>
                             <Link
                                 href="/login?signup=true"
-                                className="text-xs tracking-[0.08em] uppercase border border-white/20 text-white px-5 py-2 hover:border-white/50 hover:bg-white/5 transition-all duration-200"
+                                className="text-xs tracking-[0.08em] uppercase border border-white/20 text-white px-3 sm:px-5 py-2 hover:border-white/50 hover:bg-white/5 transition-all duration-200 whitespace-nowrap"
                             >
                                 Get started
                             </Link>

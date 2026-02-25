@@ -2,6 +2,7 @@
 
 import { ClothingItem } from '@/lib/supabase/types';
 import ItemCard from './ItemCard';
+import { motion } from 'framer-motion';
 
 interface ItemGridProps {
     items: ClothingItem[];
@@ -33,10 +34,11 @@ export default function ItemGrid({ items, onItemClick, onItemDelete, onItemEdit,
 
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {items.map((item) => (
+            {items.map((item, index) => (
                 <ItemCard
                     key={item.id}
                     item={item}
+                    index={index}
                     onClick={onItemClick ? () => onItemClick(item) : undefined}
                     onDelete={onItemDelete}
                     onEdit={onItemEdit}

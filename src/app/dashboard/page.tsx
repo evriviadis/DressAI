@@ -51,6 +51,8 @@ export default function DashboardPage() {
     const [outfitSuggestion, setOutfitSuggestion] = useState<OutfitSuggestion | null>(null);
     const [activeTab, setActiveTab] = useState<'closet' | 'suggest'>('closet');
     const [selectedCategory, setSelectedCategory] = useState('all');
+    type SortOption = 'newest' | 'oldest' | 'category';
+    const [sortBy, setSortBy] = useState<SortOption>('newest');
     const [editingItem, setEditingItem] = useState<ClothingItem | null>(null);
 
     const supabase = createClient();
@@ -65,7 +67,16 @@ export default function DashboardPage() {
 
     useEffect(() => { fetchItems(); }, [fetchItems]);
 
-    const filteredItems = selectedCategory === 'all' ? items : items.filter(item => item.category?.toLowerCase() === selectedCategory);
+    const filteredItems = (selectedCategory === 'all' ? [...items] : items.filter(item => item.category?.toLowerCase() === selectedCategory)).sort((a, b) => {
+        if (sortBy === 'newest') {
+            return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+        } else if (sortBy === 'oldest') {
+            return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+        } else if (sortBy === 'category') {
+            return (a.category || '').localeCompare(b.category || '');
+        }
+        return 0;
+    });
     const categoryCounts = CATEGORIES.reduce((acc, cat) => {
         acc[cat.value] = cat.value === 'all' ? items.length : items.filter(item => item.category?.toLowerCase() === cat.value).length;
         return acc;
@@ -157,27 +168,46 @@ export default function DashboardPage() {
 
                 <div className="h-px bg-white/6 mb-6" />
 
-                {/* Category Filter */}
+                {/* Category Filter & Sorting */}
                 {activeTab === 'closet' && !isLoading && items.length > 0 && (
-                    <div className="flex gap-0 overflow-x-auto mb-6 -mt-2">
-                        {CATEGORIES.map((cat) => {
-                            const isActive = selectedCategory === cat.value;
-                            return (
-                                <button
-                                    key={cat.value}
-                                    onClick={() => setSelectedCategory(cat.value)}
-                                    className={`flex flex-col items-center gap-1 px-4 py-2.5 text-xs whitespace-nowrap transition-all cursor-pointer border-b-2 -mb-px ${isActive
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 -mt-2">
+                        <div className="flex gap-0 overflow-x-auto">
+                            {CATEGORIES.map((cat) => {
+                                const isActive = selectedCategory === cat.value;
+                                return (
+                                    <button
+                                        key={cat.value}
+                                        onClick={() => setSelectedCategory(cat.value)}
+                                        className={`group flex flex-col items-center gap-1 px-4 py-2.5 text-xs whitespace-nowrap transition-all cursor-pointer border-b-2 -mb-px active:scale-95 ${isActive
                                             ? 'text-white border-white'
-                                            : 'text-neutral-700 border-transparent hover:text-neutral-400'
-                                        }`}
+                                            : 'text-neutral-700 border-transparent hover:text-neutral-300'
+                                            }`}
+                                    >
+                                        <svg className={`w-4 h-4 transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}>
+                                            <path d={cat.icon} />
+                                        </svg>
+                                        <span className="text-[10px] tracking-wide">{cat.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <div className="flex items-center gap-3 pr-2 self-end sm:self-auto">
+                            <span className="text-[10px] tracking-[0.2em] text-neutral-500 uppercase">Sort</span>
+                            <div className="relative">
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value as SortOption)}
+                                    className="appearance-none bg-neutral-900 border border-white/10 text-white text-xs px-3 py-1.5 pr-8 rounded-full outline-none cursor-pointer hover:border-white/30 transition-colors focus:ring-1 focus:ring-white/50"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}>
-                                        <path d={cat.icon} />
-                                    </svg>
-                                    <span className="text-[10px] tracking-wide">{cat.label}</span>
-                                </button>
-                            );
-                        })}
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="category">By Category</option>
+                                </select>
+                                <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 )}
 

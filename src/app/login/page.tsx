@@ -142,7 +142,7 @@ function LoginForm() {
                                 <label className={labelClass}>Username</label>
                                 <div className="relative">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-600 text-sm">@</span>
-                                    <input type="text" value={username} onChange={e => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))} required maxLength={20} className={`${inputClass} pl-8`} placeholder="yourname" />
+                                    <input type="text" value={username} onChange={e => setUsername(e.target.value.toLowerCase().replace(/@/g, '').replace(/[^a-z0-9_]/g, ''))} required maxLength={20} className={`${inputClass} pl-8`} placeholder="yourname" />
                                 </div>
                                 <p className="mt-1 text-xs text-neutral-600">3–20 chars, letters, numbers, underscores</p>
                             </div>
@@ -156,13 +156,13 @@ function LoginForm() {
 
                     <div>
                         <label className={labelClass}>Password</label>
-                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className={inputClass} placeholder="••••••••" />
+                        <input type="password" autoComplete={isSignUp ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className={inputClass} placeholder="••••••••" />
                     </div>
 
                     {isSignUp && (
                         <div>
                             <label className={labelClass}>Confirm Password</label>
-                            <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required minLength={6} className={inputClass} placeholder="••••••••" />
+                            <input type="password" autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required minLength={6} className={inputClass} placeholder="••••••••" />
                         </div>
                     )}
 
