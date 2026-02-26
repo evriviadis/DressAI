@@ -1,12 +1,26 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import InteractiveHero from '@/components/effects/InteractiveHero';
 import TiltCard from '@/components/effects/TiltCard';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import MobileNav from '@/components/layout/MobileNav';
 
 export default function Home() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   useEffect(() => {
+    // Check if user is logged in so we can show the mobile nav
+    const checkUser = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsAuthenticated(true);
+      }
+    };
+    checkUser();
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting && window.location.hash === '#how') {
@@ -129,16 +143,16 @@ export default function Home() {
 
       {/* Bottom CTA strip */}
       <div className="h-px bg-white/6 mx-6 sm:mx-10" />
-      <section className="px-6 sm:px-10 py-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+      <section className="px-6 sm:px-10 py-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 mb-16 md:mb-0">
         <p className="text-lg text-neutral-400 max-w-sm leading-relaxed">
-          Ready to know exactly what to wear, every day?
+          Ready to know exactly what to wear-evry day?
         </p>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link
-            href="/login?signup=true"
+            href={isAuthenticated ? "/dashboard" : "/login?signup=true"}
             className="inline-flex items-center gap-3 text-sm font-medium text-white border border-white/20 px-8 py-4 hover:border-white hover:bg-white hover:text-black transition-all duration-300"
           >
-            Get started
+            {isAuthenticated ? "Go to closet" : "Get started"}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
@@ -148,7 +162,7 @@ export default function Home() {
 
       {/* Footer */}
       <div className="h-px bg-white/5" />
-      <footer className="px-6 sm:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="px-6 sm:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 pb-24 md:pb-6">
         <div className="flex items-center gap-6 text-xs text-neutral-600">
           <p className="text-neutral-500">© 2026 evryWear</p>
           <Link href="#" className="hover:text-white transition-colors">Terms</Link>
@@ -157,6 +171,8 @@ export default function Home() {
         <p className="text-xs text-neutral-600">Powered by AI</p>
       </footer>
 
+      {/* Conditionally render MobileNav if signed in */}
+      {isAuthenticated && <MobileNav />}
     </div>
   );
 }
